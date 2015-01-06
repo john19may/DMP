@@ -86,6 +86,23 @@ public class FindLCSofManyStrings {
 				{
 					if(j==0)
 					{
+						Edge e = act_pt.active_node.hm.get(act_pt.active_edge);
+						Label ori = e.label.getUpdated();
+						
+						
+						if(ori.s + act_pt.active_length<=ori.e)
+						{
+							Node temp = e.pointer;
+							
+							Node n = new Node();
+							e.pointer = n;
+						
+							e.label = new Label(ori.s, ori.s + act_pt.active_length-1, false);
+							
+							Edge e2 = new Edge(ori.s + act_pt.active_length, current, temp, true);
+							n.hm.put(whole_string.charAt(ori.s + act_pt.active_length), e2);
+						}
+						
 						
 					}
 				}

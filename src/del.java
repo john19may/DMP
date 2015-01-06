@@ -47,7 +47,7 @@ public class del {
 		        Map.Entry pairs = (Map.Entry)it.next();
 		        a[j].str = (String)pairs.getKey();
 		        if((int)pairs.getValue()>1)
-		        a[j].n = ((int)pairs.getValue())*a[j].str.length();
+		        a[j].n = ((int)pairs.getValue());
 		        else
 		        	a[j].n = 0;
 		        j++;
@@ -93,4 +93,3 @@ public class del {
 		
 	 }
 }
-//done
