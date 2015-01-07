@@ -17,8 +17,9 @@ public class Edge {
 		label.isCurrentSysmbol = isEqualToCurrent;
 	}
 	
-	public char getFirstChar()
+	public int getLength()
 	{
-		return FindLCSofManyStrings.whole_string.charAt(0);
+		Label l = label.getUpdated();
+		return l.e - l.s +1;
 	}
 }

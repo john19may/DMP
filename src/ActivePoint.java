@@ -18,11 +18,4 @@ public class ActivePoint {
 		active_length = 0;
 	}
 	
-	public char getNextChar()
-	{
-		Label l = active_node.hm.get(active_edge).label.getUpdated();
-		String str = FindLCSofManyStrings.whole_string.substring(l.s, l.e+1);
-		return str.charAt(active_length);
-	}
-	
 }

@@ -1,3 +1,5 @@
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,7 +49,7 @@ public class del {
 		        Map.Entry pairs = (Map.Entry)it.next();
 		        a[j].str = (String)pairs.getKey();
 		        if((int)pairs.getValue()>1)
-		        a[j].n = ((int)pairs.getValue());
+		        a[j].n = ((int)pairs.getValue())*a[j].str.length();
 		        else
 		        	a[j].n = 0;
 		        j++;

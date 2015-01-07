@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Scanner;
 
 
@@ -17,98 +19,99 @@ public class FindLCSofManyStrings {
 	
 	private static ArrayList<String> listOfTheWordsToBeAdded;
 	
+	//The end characters needed for Suffix Tree Algorithm
+	//right now we have 1000 characters as delimiters to end the string
+	//so we can process at max 1000 string in 0ne time
+	//I have chosen these characters because they are from old "YI syllables" probably not used today.
+	private static int DELI1 = 0xA000, DELI2 = 0xA40F;
+	
 	public static void main(String args[])
 	{
+		//scanning all the strings
+		int n;
+		Scanner sc = new Scanner(System.in);
+		n = sc.nextInt();
 		
-		//Inputing all of the strings and initializing
+		int deli = DELI1;
 		
-		int no_of_strings;
-		
-		@SuppressWarnings("resource")
-		Scanner in = new Scanner(System.in);
-		
-		no_of_strings = in.nextInt();
-		
-		String[] arr = new String[no_of_strings];
-		
-		for(int i = 0;i<no_of_strings;i++)
+		for(int iii = 0;iii<n;iii++)
 		{
-			arr[i] = in.next();
-			arr[i]+='*';
+			String str = sc.next();
+			str+=((char)deli);
+			whole_string+=str;
 		}
+		//input complete
 		
-		for(int i = 0;i<no_of_strings;i++)
-		{
-			whole_string+=arr[i];
-		}
-
+		//initializing variables
+		current = 0;
+		
 		root = new Node();
 		
 		act_pt.initialize(root);
 		
-		listOfTheWordsToBeAdded = new ArrayList<String>();
+		listOfTheWordsToBeAdded = new ArrayList<>();
+		////initializing variables complete
 		
-		//Completed inputing all of the strings
-		
-		for(int i=0;i<whole_string.length();i++)
+		//MAJOR LOOP BEGINS
+		for(n = 0; n<whole_string.length(); n++)
 		{
-			current = i;
-			char cur_char = whole_string.charAt(i);
+			char cur_char = whole_string.charAt(n);
 			
-			//not same character as the first character on the label of the edge
-			if(remainder==1&&act_pt.active_node.ifEdgeExist(cur_char)==null)
+			//if we are at root and new char has to be inserted
+			if(act_pt.active_node==root&&act_pt.active_length==0&&root.ifEdgeExist(cur_char)==null)
 			{
-				Node n = new Node();
-				Edge e = new Edge(i, i, n, true);
-				act_pt.active_node.addEdge(cur_char, e);
+				Node new_node = new Node(); 
+				Edge e = new Edge(n, n, new_node, true);
+				root.addEdge(cur_char, e);
 			}
-			else if(remainder==1&&act_pt.active_node.ifEdgeExist(cur_char)!=null)
+			//we are at root and we have to insert a new character which is already present as starting point of one of the edges
+			else if(act_pt.active_node==root&&act_pt.active_length==0&&root.ifEdgeExist(cur_char)!=null)
 			{
-				act_pt.change(act_pt.active_node, cur_char, act_pt.active_length+1);
+				act_pt.change(root, cur_char, 1);
 				remainder++;
-				listOfTheWordsToBeAdded.add(cur_char+"");
+				listOfTheWordsToBeAdded.add(0, cur_char+"");
 			}
-			else if(act_pt.getNextChar()==cur_char)
+			else if(act_pt.active_node==root&&act_pt.active_length!=0&&act_pt.active_length<root.ifEdgeExist(act_pt.active_edge).getLength())
 			{
-				act_pt.change(act_pt.active_node, act_pt.active_edge, act_pt.active_length+1);
-				remainder++;
-				
-				for(int j=0;j<listOfTheWordsToBeAdded.size();j++)
+				Edge e = root.ifEdgeExist(act_pt.active_edge);
+				if(cur_char==whole_string.charAt(e.label.getUpdated().s+act_pt.active_length))
 				{
-					listOfTheWordsToBeAdded.set(j, listOfTheWordsToBeAdded.get(j)+cur_char);
-				}
-				
-				listOfTheWordsToBeAdded.add(cur_char+"");
-			}
-			else
-			{
-				for(int j=0;j<listOfTheWordsToBeAdded.size();j++)
-				{
-					if(j==0)
+					act_pt.change(root, act_pt.active_edge, act_pt.active_length+1);
+					remainder++;
+					for(int i=0;i<listOfTheWordsToBeAdded.size();i++)
 					{
-						Edge e = act_pt.active_node.hm.get(act_pt.active_edge);
-						Label ori = e.label.getUpdated();
-						
-						
-						if(ori.s + act_pt.active_length<=ori.e)
+						listOfTheWordsToBeAdded.set(i, listOfTheWordsToBeAdded.get(i)+cur_char);
+					}
+					listOfTheWordsToBeAdded.add(cur_char+"");
+				}
+				else
+				{
+					for(int i=0;i<listOfTheWordsToBeAdded.size();i++)
+					{
+						listOfTheWordsToBeAdded.set(i, listOfTheWordsToBeAdded.get(i)+cur_char);
+					}
+					listOfTheWordsToBeAdded.add(cur_char+"");
+					
+					for(int i=0;i<listOfTheWordsToBeAdded.size();i++)
+					{
+						if(i==0)
 						{
 							Node temp = e.pointer;
-							
-							Node n = new Node();
-							e.pointer = n;
-						
-							e.label = new Label(ori.s, ori.s + act_pt.active_length-1, false);
-							
-							Edge e2 = new Edge(ori.s + act_pt.active_length, current, temp, true);
-							n.hm.put(whole_string.charAt(ori.s + act_pt.active_length), e2);
+							Label l  = e.label.getUpdated();
+							Node new_node = new Node();
+							e.pointer = new_node;
+							e.label = new Label(l.s, l.s+act_pt.active_length-1, false);
+							Edge new_edge = new Edge(l.s+act_pt.active_length, l.e, temp, l.isCurrentSysmbol);
+							new_node.addEdge(whole_string.charAt(l.s+act_pt.active_length), new_edge);
+							Node new_node2 = new Node();
+							Edge new_edge2 = new Edge(n, n, new_node2, true);
+							new_node.addEdge(cur_char, new_edge2);
 						}
-						
-						
 					}
 				}
 			}
 		}
+		
 	}
 	
 }
-
