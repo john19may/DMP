@@ -15,6 +15,7 @@ public class ActivePoint {
 	public void initialize(Node root)
 	{
 		active_node = root;
+		active_edge = '\0';
 		active_length = 0;
 	}
 	
